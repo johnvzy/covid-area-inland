@@ -76,12 +76,13 @@ export class MapviewComponent implements OnInit {
 
     try {
       // Load the modules for the ArcGIS API for JavaScript
-      const [EsriMap, EsriMapView, SceneView, FeatureLayer, GraphicsLayer, WebScene] = await loadModules([
+      const [EsriMap, EsriMapView, SceneView, FeatureLayer, GraphicsLayer, Editor, WebScene] = await loadModules([
         "esri/Map",
         "esri/views/MapView",
         "esri/views/SceneView",
         "esri/layers/FeatureLayer",
         "esri/layers/GraphicsLayer",
+        "esri/widgets/Editor",
         "esri/WebScene"
       ]);
 
@@ -94,17 +95,14 @@ export class MapviewComponent implements OnInit {
         }
       })
 
-      const threeDLayer = new FeatureLayer({
-        url: "https://services2.arcgis.com/Xp2D1uPq1orZ37XY/ArcGIS/rest/services/3d_area/FeatureServer/0"
-      })      
-
-      var scene = new WebScene({
+      const scene = new WebScene({
         portalItem: {
-            // autocasts as new PortalItem()
-            id: "d0aa45b4db7d44a7b1e4dd7c23037d90" //or 4eb475d9671349e38c819fa79ef3e522
+          // autocasts as new PortalItem()
+          id: "d0aa45b4db7d44a7b1e4dd7c23037d90" //or 4eb475d9671349e38c819fa79ef3e522
         }
-    });
+      });
 
+      // initialize settings
       const appConfig = {
         mapView: null,
         sceneView: null,
@@ -120,6 +118,9 @@ export class MapviewComponent implements OnInit {
         // map: map
       };
 
+      //Editor Widget
+      const editorWidget = new Editor();
+
       // Configure the Map
       const mapProperties: esri.MapProperties = {
         basemap: this._basemap,
@@ -134,6 +135,8 @@ export class MapviewComponent implements OnInit {
       appConfig.mapView = this.createView(mapViewProperties, "2d", EsriMapView, SceneView);
       appConfig.mapView.map = map;
       appConfig.activeView = appConfig.mapView;
+      editorWidget.view = appConfig.mapView;
+      appConfig.mapView.ui.add(editorWidget, "top-right");
 
       //initialize 3d properties
       mapViewProperties.container = null;
