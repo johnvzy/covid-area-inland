@@ -1,1 +1,6 @@
-<div id="viewDiv" #mapViewNode></div>
+<div id="viewDiv" #mapViewNode>
+</div>
+<div id="infoDiv">
+    <input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" [value]="toogleButton"
+        (click)="toggleView()" />
+</div>

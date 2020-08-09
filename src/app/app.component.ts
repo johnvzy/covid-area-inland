@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'covid-area-inland';
+
+  mapInfo(value:any){
+    console.log(value);
+  }
 }
