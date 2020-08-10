@@ -18,3 +18,18 @@
         box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px;
     }
 }
+
+#editor {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#editor-btn {
+    position: absolute;
+    background-color: black;
+    width: 100px;
+    height: 100px;
+    top: 0;
+    right: 0;
+}

@@ -1,11 +1,8 @@
 import { Component, OnInit, Output, ElementRef, ViewChild, EventEmitter, Input } from '@angular/core';
 import esri = __esri; // Esri TypeScript Types
 import { loadModules } from "esri-loader";
-import { async } from '@angular/core/testing';
-import { Observable, observable, Observer, fromEvent, pipe, interval } from 'rxjs';
-import { take, throttle } from 'rxjs/operators';
-import { strict } from 'assert';
-
+import { interval, pipe, } from 'rxjs';
+import { MapviewService } from '../mapview.service'
 @Component({
   selector: 'app-mapview',
   templateUrl: './mapview.component.html',
@@ -17,18 +14,16 @@ export class MapviewComponent implements OnInit {
   // The <div> where we will place the map
   @ViewChild("mapViewNode", { static: true }) private mapViewEl: ElementRef;
   @ViewChild("dateEvent", { static: false }) private dateViewElement: ElementRef;
-
+  @ViewChild("editorView", { static: false }) private editorViewElement: ElementRef;
   /**
    * _zoom sets map zoom
    * _center sets map center
    * _basemap sets type of map
    * _loaded provides map loaded status
    */
-  private _zoom = 8;
-  private _center: Array<number> = [117.3142, 5.2742];
-  private _basemap = "streets-navigation-vector";
-  private _loaded = false;
+
   private _view: esri.MapView = null;
+  private _loaded = false;
   private appConfig: any;
   private switchButtonValue: string = "3D";
 
@@ -38,52 +33,22 @@ export class MapviewComponent implements OnInit {
     return this._loaded;
   }
 
-  @Input()
-  set zoom(zoom: number) {
-    this._zoom = zoom;
-  }
-
-  get zoom(): number {
-    return this._zoom;
-  }
-
-  @Input()
-  set center(center: Array<number>) {
-    this._center = center;
-  }
-
-  get center(): Array<number> {
-    return this._center;
-  }
-
-  @Input()
-  set basemap(basemap: string) {
-    this._basemap = basemap;
-  }
-
-  get basemap(): string {
-    return this._basemap;
-  }
-
   get toogleButton(): string {
     return this.switchButtonValue;
   }
 
-  constructor() { }
+  constructor(private mapViewService: MapviewService) { }
 
   async initializeMap() {
-
-
     try {
       // Load the modules for the ArcGIS API for JavaScript
-      const [EsriMap, EsriMapView, SceneView, FeatureLayer, GraphicsLayer, Editor, WebScene] = await loadModules([
+      const [EsriMap, EsriMapView, SceneView, FeatureLayer, Editor, WebScene] = await loadModules([
         "esri/Map",
         "esri/views/MapView",
         "esri/views/SceneView",
         "esri/layers/FeatureLayer",
-        "esri/layers/GraphicsLayer",
         "esri/widgets/Editor",
-        "esri/WebScene"
+        "esri/WebScene",
       ]);
 
       const twoDLayer = new FeatureLayer({
@@ -113,8 +78,8 @@ export class MapviewComponent implements OnInit {
       // Initialize the MapView
       const mapViewProperties: esri.MapViewProperties = {
         container: appConfig.container,
-        center: this._center,
-        zoom: this._zoom,
+        center: this.mapViewService.center,
+        zoom: this.mapViewService.zoom,
         // map: map
       };
 
@@ -123,11 +88,9 @@ export class MapviewComponent implements OnInit {
 
       // Configure the Map
       const mapProperties: esri.MapProperties = {
-        basemap: this._basemap,
+        basemap: this.mapViewService.basemap,
         // layers: [graphicsLayer]
       };
-      const graphicsLayer = new GraphicsLayer();
-      const currGeometry = [];
       const map: esri.Map = new EsriMap(mapProperties);
 
       map.add(twoDLayer)
@@ -135,8 +98,11 @@ export class MapviewComponent implements OnInit {
       appConfig.mapView = this.createView(mapViewProperties, "2d", EsriMapView, SceneView);
       appConfig.mapView.map = map;
       appConfig.activeView = appConfig.mapView;
+
       editorWidget.view = appConfig.mapView;
-      appConfig.mapView.ui.add(editorWidget, "top-right");
+      editorWidget.container = this.editorViewElement.nativeElement.id
+
+      appConfig.mapView.ui.add(editorWidget);
 
       //initialize 3d properties
       mapViewProperties.container = null;
@@ -180,6 +146,16 @@ export class MapviewComponent implements OnInit {
       this.appConfig = esriObject.appConfig;
       console.log("mapView ready: ", esriObject.appConfig.mapView.ready);
       this.mapLoadedEvent.emit(true);
+
+      /// await element of ersi-view
+      let stop = interval(1000).subscribe(() => {
+        if (this.editorViewElement.nativeElement.offsetHeight !== 0) {
+          console.log('get Height: ' +
+            this.editorViewElement.nativeElement.offsetHeight + '\nget Width: ' +
+            this.editorViewElement.nativeElement.offsetWidth)
+          stop.unsubscribe()
+        }
+      })
     });
   }
 
@@ -188,7 +164,13 @@ export class MapviewComponent implements OnInit {
     console.log(pt.latitude + " " + pt.longitude);
   }
 
+  // *test get width after page rendered
+  get currentSize() {
+    return this.editorViewElement.nativeElement.offsetHeight;
+  }
+
   ngAfterViewInit() {
+    this.mapViewService.zoom;
   }
 
   ngOnDestroy() {
