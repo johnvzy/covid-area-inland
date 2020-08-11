@@ -22,7 +22,7 @@ export class MapviewService implements OnInit {
     return this.mapInfo._zoom;
   }
 
-  /*** center ***/ 
+  /*** center ***/
   set center(center: Array<number>) {
     this.mapInfo._center = center;
   }
@@ -40,6 +40,22 @@ export class MapviewService implements OnInit {
     return this.mapInfo._basemap;
   }
 
+  /*** editor_view ***/
+  set editorHeight(height: number) {
+    this.mapInfo._editorHeight = height;
+  }
+
+  get editorHeight(): number {
+    return this.mapInfo._editorHeight;
+  }
+
+  set editorWidth(width: number) {
+    this.mapInfo._editorWidth = width;
+  }
+
+  get editorWidth(): number {
+    return this.mapInfo._editorWidth;
+  }
 }
 
 

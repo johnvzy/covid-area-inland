@@ -3,39 +3,42 @@ import esri = __esri; // Esri TypeScript Types
 import { loadModules } from "esri-loader";
 import { interval, pipe, } from 'rxjs';
 import { MapviewService } from '../mapview.service'
+import { trigger, transition, style, animate, state } from '@angular/animations';
+
 @Component({
   selector: 'app-mapview',
   templateUrl: './mapview.component.html',
-  styleUrls: ['./mapview.component.scss']
+  styleUrls: ['./mapview.component.scss'],
+  animations: [
+    trigger('editorMain', [
+      state('enter', style({ right: 0, visibility: 'visible' })),
+      state('leave', style({ right: '{{editorWidth}}px', visibility: 'hidden' }), { params: { editorWidth: 0 } }),
+      transition("enter => leave", animate('1s ease')),
+      transition("leave => enter", animate('1s ease'))
+    ]),
+    trigger('editorButton', [
+      state('enter', style({ right: '{{editorWidth}}px' }), { params: { editorWidth: 0 } }),
+      state('leave', style({ right: 0 })),
+      transition("enter => leave", animate('1s ease')),
+      transition("leave => enter", animate('1s ease'))
+    ])
+  ]
 })
+
 export class MapviewComponent implements OnInit {
   @Output() mapLoadedEvent = new EventEmitter<boolean>();
 
   // The <div> where we will place the map
   @ViewChild("mapViewNode", { static: true }) private mapViewEl: ElementRef;
-  @ViewChild("dateEvent", { static: false }) private dateViewElement: ElementRef;
   @ViewChild("editorView", { static: false }) private editorViewElement: ElementRef;
-  /**
-   * _zoom sets map zoom
-   * _center sets map center
-   * _basemap sets type of map
-   * _loaded provides map loaded status
-   */
+
+  @Input() test: string;
 
   private _view: esri.MapView = null;
-  private _loaded = false;
+  private _loaded = false;                /* _loaded provides map loaded status */
   private appConfig: any;
   private switchButtonValue: string = "3D";
-
-  sketcHShow: boolean = false;
-
-  get mapLoaded(): boolean {
-    return this._loaded;
-  }
-
-  get toogleButton(): string {
-    return this.switchButtonValue;
-  }
+  private editorShow: boolean = true;
 
   constructor(private mapViewService: MapviewService) { }
 
@@ -88,8 +91,7 @@ export class MapviewComponent implements OnInit {
 
       // Configure the Map
       const mapProperties: esri.MapProperties = {
-        basemap: this.mapViewService.basemap,
-        // layers: [graphicsLayer]
+        basemap: this.mapViewService.basemap
       };
       const map: esri.Map = new EsriMap(mapProperties);
 
@@ -150,9 +152,9 @@ export class MapviewComponent implements OnInit {
       /// await element of ersi-view
       let stop = interval(1000).subscribe(() => {
         if (this.editorViewElement.nativeElement.offsetHeight !== 0) {
-          console.log('get Height: ' +
-            this.editorViewElement.nativeElement.offsetHeight + '\nget Width: ' +
-            this.editorViewElement.nativeElement.offsetWidth)
+          this.mapViewService.editorHeight = this.editorViewElement.nativeElement.offsetHeight
+          this.mapViewService.editorWidth = this.editorViewElement.nativeElement.offsetWidth
+          this._loaded = true;
           stop.unsubscribe()
         }
       })
@@ -165,9 +167,6 @@ export class MapviewComponent implements OnInit {
   }
 
   // *test get width after page rendered
-  get currentSize() {
-    return this.editorViewElement.nativeElement.offsetHeight;
-  }
 
   ngAfterViewInit() {
     this.mapViewService.zoom;
@@ -178,5 +177,33 @@ export class MapviewComponent implements OnInit {
       // destroy the map view
       this._view.container = null;
     }
+  }
+
+  setEditorToggleShow() {
+    this.editorShow = !this.editorShow;
+  }
+
+  get toggleButtonIcon(): string {
+    return this.editorShow ? '>' : '<';
+  }
+
+  get editorToggleShow(): string {
+    return this.editorShow ? 'enter' : 'leave';
+  }
+
+  get mapLoaded(): boolean {
+    return this._loaded;
+  }
+
+  get toogleButton(): string {
+    return this.switchButtonValue;
+  }
+
+  get editorRight_Nega(): number {
+    return -Math.abs(this.mapViewService.editorWidth);
+  }
+
+  get editorRight(): number {
+    return this.mapViewService.editorWidth;
   }
 }

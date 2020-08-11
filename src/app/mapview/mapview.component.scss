@@ -26,10 +26,19 @@
 }
 
 #editor-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: absolute;
-    background-color: black;
-    width: 100px;
-    height: 100px;
+    // background-color: white;
+    width: 20px;
+    height: 238px;
     top: 0;
-    right: 0;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
 }

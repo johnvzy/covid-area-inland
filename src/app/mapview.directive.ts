@@ -1,4 +1,4 @@
-import { Directive, Input, OnInit } from '@angular/core';
+import { Directive, Input, OnInit, ElementRef } from '@angular/core';
 import { MapviewService } from './mapview.service'
 @Directive({
   selector: '[appMapview]'
