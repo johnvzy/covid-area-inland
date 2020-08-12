@@ -5,6 +5,5 @@ export const MapInfo: MapModel = {
     _center: [117.3142, 5.2742],
     _basemap: "streets-navigation-vector",
     _view: null,
-    _editorHeight: 0,
-    _editorWidth: 0
+    _editorObject: null
 }

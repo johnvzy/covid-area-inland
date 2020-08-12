@@ -4,12 +4,12 @@
     <input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" [value]="toogleButton"
         (click)="toggleView()" />
 </div>
-<div id="editor" [@editorMain]="{
+<!-- <div id="editor" [@editorMain]="{
     value: editorToggleShow, 
     params: {editorWidth: editorRight_Nega}
-}" #editorView>
+}" #editorView> -->
+<div id="editor" #editorView [ngStyle]="{'right': editorRight_Nega + 'px'}">
 </div>
-<button id="editor-btn" *ngIf="mapLoaded" (click)="setEditorToggleShow()" [@editorButton]="{
-    value: editorToggleShow, 
-    params: {editorWidth: editorRight}
-}">{{toggleButtonIcon}}</button>
+<button id="editor-btn" *ngIf="mapLoaded" (click)="setEditorToggleShow()" [ngStyle]="{
+        'right': editorRight + 'px'
+ }">{{toggleButtonIcon}}</button>

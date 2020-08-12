@@ -41,20 +41,12 @@ export class MapviewService implements OnInit {
   }
 
   /*** editor_view ***/
-  set editorHeight(height: number) {
-    this.mapInfo._editorHeight = height;
+  set editorObj(obj: any) {
+    this.mapInfo._editorObject = obj;
   }
 
-  get editorHeight(): number {
-    return this.mapInfo._editorHeight;
-  }
-
-  set editorWidth(width: number) {
-    this.mapInfo._editorWidth = width;
-  }
-
-  get editorWidth(): number {
-    return this.mapInfo._editorWidth;
+  get editorObj(): any {
+    return this.mapInfo._editorObject;
   }
 }
 

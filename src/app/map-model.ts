@@ -9,6 +9,5 @@ export interface MapModel {
     _center: Array<number>;
     _basemap: string;
     _view: any;
-    _editorHeight: number,
-    _editorWidth: number
+    _editorObject: any,
 }

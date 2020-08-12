@@ -1,7 +1,8 @@
 import { Component, OnInit, Output, ElementRef, ViewChild, EventEmitter, Input } from '@angular/core';
 import esri = __esri; // Esri TypeScript Types
 import { loadModules } from "esri-loader";
-import { interval, pipe, } from 'rxjs';
+import { EMPTY, interval, pipe, Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { MapviewService } from '../mapview.service'
 import { trigger, transition, style, animate, state } from '@angular/animations';
 
@@ -39,6 +40,8 @@ export class MapviewComponent implements OnInit {
   private appConfig: any;
   private switchButtonValue: string = "3D";
   private editorShow: boolean = true;
+  private domRepresentation: any;
+  private currentWidth: number;
 
   constructor(private mapViewService: MapviewService) { }
 
@@ -150,12 +153,13 @@ export class MapviewComponent implements OnInit {
       this.mapLoadedEvent.emit(true);
 
       /// await element of ersi-view
-      let stop = interval(1000).subscribe(() => {
+      let stop = interval(250).subscribe(() => {
         if (this.editorViewElement.nativeElement.offsetHeight !== 0) {
-          this.mapViewService.editorHeight = this.editorViewElement.nativeElement.offsetHeight
-          this.mapViewService.editorWidth = this.editorViewElement.nativeElement.offsetWidth
+          this.mapViewService.editorObj = this.editorViewElement.nativeElement
           this._loaded = true;
-          stop.unsubscribe()
+          this.currentWidth = this.mapViewService.editorObj.offsetWidth;
+          this.domRepresentation = document.getElementsByClassName('esri-editor__feature-list-item');
+          stop.unsubscribe();
         }
       })
     });
@@ -180,6 +184,7 @@ export class MapviewComponent implements OnInit {
   }
 
   setEditorToggleShow() {
+    this.currentWidth = this.mapViewService.editorObj.offsetWidth
     this.editorShow = !this.editorShow;
   }
 
@@ -200,10 +205,15 @@ export class MapviewComponent implements OnInit {
   }
 
   get editorRight_Nega(): number {
-    return -Math.abs(this.mapViewService.editorWidth);
+    return this.editorShow ? 0 : -Math.abs(this.currentWidth);
   }
 
   get editorRight(): number {
-    return this.mapViewService.editorWidth;
+
+    if (this.domRepresentation.length !== 0) {
+      return this.editorShow ? this.currentWidth : 0
+    } else {
+      return this.editorShow ? this.mapViewService.editorObj.offsetWidth : 0;
+    }
   }
 }
