@@ -8,8 +8,11 @@
     value: editorToggleShow, 
     params: {editorWidth: editorRight_Nega}
 }" #editorView> -->
-<div id="editor" #editorView [ngStyle]="{'right': editorRight_Nega + 'px'}">
+<div id="editor" #editorView [ngStyle]="{'right': editorMainView + 'px'}">
 </div>
 <button id="editor-btn" *ngIf="mapLoaded" (click)="setEditorToggleShow()" [ngStyle]="{
-        'right': editorRight + 'px'
- }">{{toggleButtonIcon}}</button>
+        'right': editorButtonViewPostion + 'px',
+        'height': editorButtonViewHeight + 'px'
+ }">
+    <div [ngClass]="editorToggleShow ? 'right': 'left'"></div>
+</button>

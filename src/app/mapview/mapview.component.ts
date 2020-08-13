@@ -35,13 +35,14 @@ export class MapviewComponent implements OnInit {
 
   @Input() test: string;
 
-  private _view: esri.MapView = null;
   private _loaded = false;                /* _loaded provides map loaded status */
   private appConfig: any;
   private switchButtonValue: string = "3D";
   private editorShow: boolean = true;
   private domRepresentation: any;
+  private currentPositon: number;
   private currentWidth: number;
+
 
   constructor(private mapViewService: MapviewService) { }
 
@@ -157,7 +158,7 @@ export class MapviewComponent implements OnInit {
         if (this.editorViewElement.nativeElement.offsetHeight !== 0) {
           this.mapViewService.editorObj = this.editorViewElement.nativeElement
           this._loaded = true;
-          this.currentWidth = this.mapViewService.editorObj.offsetWidth;
+          this.currentPositon = this.appConfig.mapView.width - this.mapViewService.editorObj.offsetWidth - this.mapViewService.editorObj.offsetLeft;
           this.domRepresentation = document.getElementsByClassName('esri-editor__feature-list-item');
           stop.unsubscribe();
         }
@@ -177,23 +178,24 @@ export class MapviewComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    if (this._view) {
+    if (this.appConfig.mapView) {
       // destroy the map view
-      this._view.container = null;
+      this.appConfig.mapView.container = null;
     }
   }
 
   setEditorToggleShow() {
-    this.currentWidth = this.mapViewService.editorObj.offsetWidth
     this.editorShow = !this.editorShow;
+
+    if (this.editorShow) {
+      this.currentPositon = 0;
+    } else {
+      this.currentPositon = this.currentPositon - this.mapViewService.editorObj.offsetWidth;
+    }
   }
 
-  get toggleButtonIcon(): string {
-    return this.editorShow ? '>' : '<';
-  }
-
-  get editorToggleShow(): string {
-    return this.editorShow ? 'enter' : 'leave';
+  get editorToggleShow(): boolean {
+    return this.editorShow;
   }
 
   get mapLoaded(): boolean {
@@ -204,16 +206,15 @@ export class MapviewComponent implements OnInit {
     return this.switchButtonValue;
   }
 
-  get editorRight_Nega(): number {
-    return this.editorShow ? 0 : -Math.abs(this.currentWidth);
+  get editorMainView(): number {
+    return this.currentPositon ? this.currentPositon : 0
   }
 
-  get editorRight(): number {
+  get editorButtonViewPostion(): number {
+    return this.currentPositon + this.mapViewService.editorObj.offsetWidth
+  }
 
-    if (this.domRepresentation.length !== 0) {
-      return this.editorShow ? this.currentWidth : 0
-    } else {
-      return this.editorShow ? this.mapViewService.editorObj.offsetWidth : 0;
-    }
+  get editorButtonViewHeight(): number {
+    return this.mapViewService.editorObj.offsetHeight
   }
 }

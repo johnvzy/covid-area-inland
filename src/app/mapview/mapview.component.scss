@@ -1,5 +1,12 @@
 @import url("https://js.arcgis.com/4.16/esri/css/main.css");
 
+%arrow {
+    border: solid #a9a9a9;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+}
+
 #viewDiv {
     span {
         position: absolute;
@@ -22,19 +29,29 @@
 #editor {
     position: absolute;
     top: 0;
-    transition: right 1s ease;
 }
 
 #editor-btn {
+    background-color: #ffffffeb;
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
-    width: 20px;
-    height: 238px;
     top: 0;
-    border-width: thin;
-    transition: right 1s ease;
+    border-width: 0px 1px 0px 1px;
+    border-color: #f3f3f3;
+
+    .right {
+        @extend %arrow;
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+    }
+
+    .left {
+        @extend %arrow;
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+    }
 }
 
 input:focus,
