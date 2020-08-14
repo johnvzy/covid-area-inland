@@ -2,7 +2,7 @@ import { Component, OnInit, Output, ElementRef, ViewChild, EventEmitter, Input }
 import esri = __esri; // Esri TypeScript Types
 import { loadModules } from "esri-loader";
 import { EMPTY, interval, pipe, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { take, timeout, delay } from 'rxjs/operators';
 import { MapviewService } from '../mapview.service'
 import { trigger, transition, style, animate, state } from '@angular/animations';
 
@@ -33,19 +33,16 @@ export class MapviewComponent implements OnInit {
   @ViewChild("mapViewNode", { static: true }) private mapViewEl: ElementRef;
   @ViewChild("editorView", { static: false }) private editorViewElement: ElementRef;
 
-  @Input() test: string;
-
   private _loaded = false;                /* _loaded provides map loaded status */
   private appConfig: any;
   private switchButtonValue: string = "3D";
   private editorShow: boolean = true;
-  private domRepresentation: any;
   private currentPositon: number;
-  private currentWidth: number;
 
 
   constructor(private mapViewService: MapviewService) { }
 
+  /**** initial map environment ***/
   async initializeMap() {
     try {
       // Load the modules for the ArcGIS API for JavaScript
@@ -159,7 +156,6 @@ export class MapviewComponent implements OnInit {
           this.mapViewService.editorObj = this.editorViewElement.nativeElement
           this._loaded = true;
           this.currentPositon = this.appConfig.mapView.width - this.mapViewService.editorObj.offsetWidth - this.mapViewService.editorObj.offsetLeft;
-          this.domRepresentation = document.getElementsByClassName('esri-editor__feature-list-item');
           stop.unsubscribe();
         }
       })
@@ -174,7 +170,7 @@ export class MapviewComponent implements OnInit {
   // *test get width after page rendered
 
   ngAfterViewInit() {
-    this.mapViewService.zoom;
+
   }
 
   ngOnDestroy() {

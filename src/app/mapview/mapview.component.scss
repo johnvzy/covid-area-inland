@@ -38,8 +38,7 @@
     justify-content: center;
     position: absolute;
     top: 0;
-    border-width: 0px 1px 0px 1px;
-    border-color: #f3f3f3;
+    border: none;
 
     .right {
         @extend %arrow;
